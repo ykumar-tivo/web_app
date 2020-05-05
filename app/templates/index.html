@@ -1,0 +1,225 @@
+<html>
+
+<head>
+	<title>LSH SOLR Analysis Report</title>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.semanticui.min.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/scroller/1.5.1/css/scroller.semanticui.min.css">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+	<style>
+	td {
+		text-align: center;
+		vertical-align: middle;
+        width: 50px!important;
+	}
+    th{
+    width: 50px!important;
+    }
+	table {
+		margin: 10px;
+		display: block;
+		overflow-x: auto;
+        width:auto!important;
+	}
+    .ui.input{
+        width: 300px;
+    }
+	tfoot {
+         display: table-header-group;
+    }
+    .sk_input_box
+    {
+        width:100%;
+    }
+    .top_division
+    {
+        margin-bottom:100px;
+    }
+    .ui.celled.table tr td, .ui.celled.table tr th
+    {
+        border-left: 1px solid rgba(34,36,38,.1);
+       // width:100px!important;
+        border-right: 1px solid rgba(34,36,38,.1);
+    }
+    .ui.table
+    {
+        border-right:none!important;
+        border-top:none!important;
+        //border-bottom:none!important;
+    }
+    .ui.table tr td:first-child
+    {
+        word-break: break-all;
+    }
+    .btn-danger {
+        color: black;
+        background-color: white;
+        border-color: black;
+    }
+    .btn-danger:hover {
+        color: black;
+        background-color: white;
+        border-color: black;
+    }
+    .btn-danger:not(:disabled):not(.disabled).active, .btn-danger:not(:disabled):not(.disabled):active, .show>.btn-danger.dropdown-toggle {
+        color: black;
+        background-color: white;
+        border-color: black;
+    }
+
+</style>
+</head>
+
+<body style="margin-left: 5vw; margin-right: 5vw;">
+
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+	<script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+	<script type="text/javascript" language="javascript" src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.semanticui.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/scroller/1.5.1/js/dataTables.scroller.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.20/api/fnFilterOnReturn.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+
+	<script>
+        var table = "";
+        var top_left;
+		var myDropdown = 'All';
+        var entityDropdown = 'All';
+        var crossEntityDropdown = 'All';
+		$(document).ready(function () {
+			 table = $('#solrTable').DataTable({
+				dom: '<"top"i>rt<"bottom"flp><"clear">',
+				ajax: {
+				    url: "{{ url_for('get_data') }}"+"?username="+"",
+				    type: 'GET'
+				},
+				pageResize: true,
+				pageLength: {{ page_limit }},
+				serverSide: true,
+				processing : true,
+				ordering: false,
+				searching: false,
+                colReorder: true,
+                destroy : true,
+				initComplete: function () {
+                this.api().columns().every( function () {
+                    var column = this;
+                    var select = $('<input class = "sk_input_box" type = "text" id = '+column[0][0]+' ">')
+                        .appendTo( $(column.footer()).empty() )
+                    } );
+				},
+				columns: [
+					{ data: 'Source Key'},
+					{ data: 'sk_entity_type'},
+					{ data: 'Gid1'},
+					{ data: 'Gid1_entity_type'},
+					{ data: 'Lsh_score1'},
+					{ data: 'Gid1'},
+					{ data: 'Gid2_entity_type'},
+					{ data: 'Lsh_score2'},
+					{ data: 'Gid3'},
+					{ data: 'Gid3_entity_type'},
+					{ data: 'Lsh_score3'},
+					{ data: 'Gid4'},
+					{ data: 'Gid4_entity_type'},
+					{ data: 'Lsh_score4'},
+					{ data: 'Gid5'},
+					{ data: 'Gid5_entity_type'},
+					{ data: 'Lsh_score5'},
+                     ]
+
+			});
+
+});
+
+
+        var d = 0;
+        var d1 = 0;
+		$(document).on('keypress',function (e) {
+			if(e.which == 13)
+            {
+               var input = '';
+               var index_value = '';
+               var input_id = '';
+                for(var i = 0; i < 17; ++i)
+                {
+                        index_value = document.getElementById(i).value;
+                        if(index_value)
+                        {
+                            input+=index_value;
+                            input+=",";
+                            input_id += String(i);
+                            input_id += ",";
+                        }
+                    }
+
+                $('#solrTable').DataTable({
+                    dom: '<"top"i>rt<"bottom"flp><"clear">',
+                    ajax: {
+                        url: "{{ url_for('get_data') }}"+"?username="+String(input) +"&id="+input_id,
+                        type: 'GET'
+                    },
+                    pageResize: true,
+                    pageLength: {{ page_limit }},
+                    serverSide: true,
+                    processing : true,
+                    searching: false,
+                    ordering: false,
+                    colReorder: true,
+                    destroy : true,
+                    columns: [
+                        { data: 'Source Key'},
+                        { data: 'sk_entity_type'},
+                        { data: 'Gid1'},
+                        { data: 'Gid1_entity_type'},
+                        { data: 'Lsh_score1'},
+                        { data: 'Gid1'},
+                        { data: 'Gid2_entity_type'},
+                        { data: 'Lsh_score2'},
+                        { data: 'Gid3'},
+                        { data: 'Gid3_entity_type'},
+                        { data: 'Lsh_score3'},
+                        { data: 'Gid4'},
+                        { data: 'Gid4_entity_type'},
+                        { data: 'Lsh_score4'},
+                        { data: 'Gid5'},
+                        { data: 'Gid5_entity_type'},
+                        { data: 'Lsh_score5'}
+                    ]
+                });
+            }
+});
+
+
+    </script>
+<div>
+	<div>
+		<h2 align="center">Matching Analysis Report</h2>
+	</div>
+<br>
+</div>
+<div  style = "margin-top:50px">
+	<table id="solrTable" class="ui celled table " cellspacing="0" style="width:500px!important;">
+		<thead>
+            <tr>
+                {% for item in header_list %}
+                <th align = "center" bgcolor = '#7FBAC0' style =  "width: 10px"  > <font color="black">{{item}}</font></th>
+                {% endfor %}
+			</tr>
+		</thead>
+        <tfoot>
+            <tr>
+                {% for item in header_list %}
+                <th align = "center" bgcolor = "#&FBAC0" style =  "width: 10px" > <font color ="black">{{item}}</font></th>
+                {% endfor %}
+            </tr>
+        </tfoot>
+	</table>
+</div>
+</body>
+</html>
